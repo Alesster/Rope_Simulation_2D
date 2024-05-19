@@ -5,18 +5,39 @@
 #include <ctime>
 using namespace std;
 
-int main()
+class Param
 {
+private:
 	double const RHO = 1.225;	// air density
 	double const PI = 3.14159265;
 	double const g = 9.81;		// Gravitational acceleretaion
+public:
+	double getRho() { return RHO; }
+	double getPi() { return PI; }
+	double getG() { return g; }
 
 	double KA = 0.4;			// Resistant coefficient for element of mass of Rope
 	double KAend = 0.5;			// Resistant coefficient for mass at the end of Rope
 	double R = 0.02;			// Radious of Rope section
-	double Srope = PI * R * R ;	// Square of Rope section
+	double Srope = PI * R * R;	// Square of Rope section
 	double Rend = 0.05;			// Radious of end mass section
 	double Send = PI * Rend * Rend;	//Square of end mass section
+};
+
+
+int main()
+{
+	Param param;
+	double const RHO = param.getRho();	// air density
+	double const PI = param.getPi();
+	double const g = param.getG();		// Gravitational acceleretaion
+
+	double KA = param.KA;			// Resistant coefficient for element of mass of Rope
+	double KAend = param.KAend;			// Resistant coefficient for mass at the end of Rope
+	double R = param.R;			// Radious of Rope section
+	double Srope = param.Srope;	// Square of Rope section
+	double Rend = param.Rend;			// Radious of end mass section
+	double Send = param.Send;	//Square of end mass section
 	
 	//Uncomment if you want enter data from console 
 	/*int NUM;
@@ -43,9 +64,9 @@ int main()
 	double length = 0.05;	// Length of point mass of Rope in m
 	double mass = 0.02;		// Mass of point element of Rope in kg
 	double endMass = 0.2;	// Mass at the end element of Rope in kg
-	double airvel = 30;		// Speed of Air Flow in m/s
+	double airvel = 50;		// Speed of Air Flow in m/s
 	double gamma = 10;		// Angle of Air Flow with respect to horizen
-	
+	int deltaON = 0;		// Switch ON (1) or OFF (0) ocasional perturbation
 
 	vector<double> vcos(NUM);
 	vector<double> vsin(NUM);
@@ -75,12 +96,19 @@ int main()
 		endWeight = g * endMass;
 	}
 
+	srand(time(NULL));
 	for (int i = NUM-1; i >= 0; i--)
 	{
+		int rnum = rand() % 10;
+		int sign = pow(-1, rnum);
+		double randnum = ((double)rand() / RAND_MAX)*sign/100;
+		double delta = randnum * log(airvel + 1) * deltaON;
+		//cout << delta << endl;
+
 		if (i == NUM-1) 
 		{
-			RX = AirForceEnd * flowCos;
-			RY = -endWeight + AirForceEnd * flowSin;
+			RX = AirForceEnd * (1+delta) * flowCos;
+			RY = -endWeight + AirForceEnd * (1 + delta) * flowSin;
 			RTOT = sqrt(RX*RX + RY*RY);
 			vcos[i] = RY / RTOT;
 			vsin[i] = RX / RTOT;
@@ -95,7 +123,6 @@ int main()
 		}
 	}
 	
-	srand(time(NULL));
 	for (int i = 0; i < NUM; i++)
 	{
 		if (i == 0)
@@ -115,6 +142,7 @@ int main()
 	cout << "Length of Rope: " << length * NUM << " m" << endl;
 	cout << "Mass of Rope: " << mass * (NUM - 1) + endWeight/g << " kg" << endl;
 	cout << "Air Flow speed: " << airvel << " m/s, Angle of Air Flow: " << gamma << " deg" <<  endl;
+	cout << "Perturbation: " << deltaON << endl;
 	cout << "Coordinates of points of Rope" << endl;
 	cout << " Angle" << " \t \t " << "X" << " \t \t " << "Y" << endl;
 	for (int i = 0; i < NUM; i++)
